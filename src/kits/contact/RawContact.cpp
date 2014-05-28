@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Dario Casalinuovo
+ * Copyright 2011-2014 Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include <RawContact.h>
@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <string.h>
+
 
 BRawContact::BRawContact(BMessage* data)
 	:
@@ -127,22 +128,26 @@ BRawContact::_CheckDestination(BPositionIO* destination)
 	if (fFormat != B_PERSON_FORMAT)
 		return true;
 
-	// this is an exception
-	// because we can't write attributes
-	// to a BPositionIO, so we need it
-	// at least to be a BFile, otherwise
-	// you will not be able to translate
-	// something using the people
-	// translator
+	/*
+		NOTE: this is an exception
+		because we can't write attributes
+		to a BPositionIO, so we need it
+		at least to be a BFile, otherwise
+		you will not be able to translate
+		something using the people translator
+	*/
+
 	if (fFormat == B_PERSON_FORMAT) {
 		if (destination == NULL)
 			return false;
+
 		BFile* file = dynamic_cast<BFile*>(destination);
-		if (file == NULL)
+
+		if (file == NULL || file->InitCheck() != B_OK)
 			return false;
-		else if (file->InitCheck() == B_OK)
-			return true;
+
 	}
+
 	return true;
 }
 

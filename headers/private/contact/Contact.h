@@ -49,11 +49,8 @@ public:
 			status_t		CopyFieldsFrom(BContact* contact);
 			status_t		CreateDefaultFields();
 
-	// for the moment it supports only a BRawContact, in future
-	// the following methods will help to merge many BRawContacts
-	// into a BContact.
-	// delete the actual BRawContact objects
-			status_t		Append(BRawContact* contact);
+			status_t		SetTo(BRawContact* contact);
+
 			const BRawContact&	RawContact() const;
 
 			status_t		Commit();

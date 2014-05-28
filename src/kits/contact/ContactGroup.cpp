@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 - 2012 Dario Casalinuovo.
+ * Copyright 2011-2014 Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include <ContactGroup.h>
@@ -183,15 +183,3 @@ BContactGroup::AllContacts() const
 {
 	return fList;
 }
-
-
-/*
-const
-BContactRefList&
-BContactGroup::ContactsByField(ContactFieldType type, 
-	const char* value) const
-{
-	BContactRefList* ret = new BContactRefList();
-
-	return *ret;
-}*/

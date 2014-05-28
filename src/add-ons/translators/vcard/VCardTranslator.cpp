@@ -168,7 +168,9 @@ VCardTranslator::TranslateContact(BMessage* inSource,
 		ret = inSource->FindData(CONTACT_FIELD_IDENT, code,
 			i, &data, &size);
 
-		BContactField* field = BContactField::UnflattenChildClass(data, size);
+		BContactField* field
+			= BContactField::UnflattenChildClass(data, size);
+
 		if (field == NULL)
 			return B_ERROR;
 
@@ -181,18 +183,23 @@ VCardTranslator::TranslateContact(BMessage* inSource,
 		}
 
 		BString out
-			= fFieldsMap.Get(HashKey32<field_type>());
+			= fFieldsMap.Get(HashKey32<field_type>(type));
 
 		printf("%s\n", out.String());
+
 		for (int i = 0; i < field->CountUsages(); i++) {
 			HashKey32<field_usage> usage(field->GetUsage(i));
 			out += ";";
 			out += fFieldsMap.Get(usage);
 		}
+
 		_Write(outDestination, out, field->Value());
+
 		delete field;
 	}
+
 	_WriteEnd(outDestination);
+
 	return B_OK;
 }
 
@@ -240,11 +247,6 @@ VCardTranslator::_IdentifyVCard(BPositionIO* inSource,
 	// I.E. implement a custom ParseAndIdentify() method
 	// that just don't use the parser and gain performances.
 
-	// Using this initialization
-	// the parse will only verify
-	// that it's a VCard file
-	// without saving any property
-	// but still will waste resource (see the TODO)
 	VCardParser parser(inSource, true);
 	
 	if (parser.Parse() != B_OK)

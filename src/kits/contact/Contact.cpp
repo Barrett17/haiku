@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Dario Casalinuovo
+ * Copyright 2011-2014 Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include <Contact.h>
@@ -20,8 +20,7 @@ BContact::BContact(BRawContact* contact)
 	fList(20, true)
 {
 	if (contact == NULL) {
-		// Create a memory RawContact
-		// because arg is NULL
+		// This will create a memory RawContact
 		fRawContact = new BRawContact(B_CONTACT_FORMAT);
 	} else {
 		fRawContact = contact;
@@ -111,15 +110,6 @@ BContact::InitCheck() const
 	return fInitCheck;
 }
 
-/*
-status_t
-BContact::Append(BRawContact* contact)
-{
-	if (contact != NULL && 
-		contact->InitCheck() == B_OK)
-			fRawContact = contact;
-}
-*/
 
 const BRawContact&
 BContact::RawContact() const
@@ -129,7 +119,7 @@ BContact::RawContact() const
 
 
 status_t
-BContact::Append(BRawContact* contact)
+BContact::SetTo(BRawContact* contact)
 {
 	delete fRawContact;
 	fRawContact = contact;

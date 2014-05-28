@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 Casalinuovo Dario
+ * Copyright 2011-2014 Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include <HashMap.h>

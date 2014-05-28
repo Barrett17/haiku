@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Dario Casalinuovo
+ * Copyright 2011-2014 Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include <ContactField.h>
@@ -15,6 +15,7 @@
 #include "ContactPrivate.h"
 
 // TODO add decent debug to whole kit
+
 struct EqualityVisitorBase : public BContactFieldVisitor {
 	EqualityVisitorBase() : result(false) {}
 	bool result;
@@ -58,8 +59,6 @@ BContactField::IsEqual(BContactField* field)
 	if (Label().Compare(field->Label()) != 0)
 		return false;
 
-	/*for (int i = 0; i < CountUsages(); i++)
-		AddUsage(field->GetUsage(i));*/
 	return true;
 }
 
@@ -182,7 +181,7 @@ BContactField::Flatten(BPositionIO* flatData) const
 	// TODO ADD ENDIANESS CODE
 
 	// NOTE this is needed because we need to know
-	// whitch derived class we need to instantiate
+	// which derived class we need to instantiate
 	// in BContactField::UnflattenChildClass()
 	flatData->Write(&fType, sizeof(type_code));
 
@@ -243,7 +242,7 @@ BContactField::Unflatten(type_code code, BPositionIO* flatData)
 }
 
 
-// You cannot instantiate a pure BContactField
+// BContactField is virtual
 // so this method help to unflatten the correct 
 // derived class
 BContactField*

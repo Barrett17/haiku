@@ -193,8 +193,8 @@ VCardParser::DataHandler(const CARD_Char* data, int len)
 
 	if (field != NULL) {
 		_TranslateUsage(field);
-		fList.AddItem(field);
 		field->SetValue(str);
+		fList.AddItem(field);
 		//printf("data %s\n", field->Value().String());
 	}
 }

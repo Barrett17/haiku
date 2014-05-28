@@ -25,28 +25,29 @@
 class VCardTranslator : public BaseTranslator {
 public:
 	VCardTranslator();
-	
+
+		// determines whether or not this translator can convert the
+		// data in inSource to the type outType	
 	virtual status_t Identify(BPositionIO* inSource,
 		const translation_format* inFormat, BMessage* ioExtension,
 		translator_info* outInfo, uint32 outType);
-		// determines whether or not this translator can convert the
-		// data in inSource to the type outType
 
-	virtual status_t Translate(BPositionIO* inSource,
-		const translator_info* inInfo, BMessage* ioExtension,
-		uint32 outType, BPositionIO* outDestination);
 		// this function is the whole point of the Translation Kit,
 		// it translates the data in inSource to outDestination
 		// using the format outType
+	virtual status_t Translate(BPositionIO* inSource,
+		const translator_info* inInfo, BMessage* ioExtension,
+		uint32 outType, BPositionIO* outDestination);
 		
 	virtual BView* NewConfigView(TranslatorSettings* settings);
 
 protected:
-	virtual ~VCardTranslator();
 		// this is protected because the object is deleted by the
 		// Release() function instead of being deleted directly by
 		// the user
-		
+
+	virtual ~VCardTranslator();
+	
 private:
 	status_t TranslateContact(BMessage* inSource, 
 		BMessage* ioExtension, BPositionIO* outDestination);

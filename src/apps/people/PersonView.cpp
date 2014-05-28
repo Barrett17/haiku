@@ -349,10 +349,10 @@ PersonView::BuildGroupMenu(BStringContactField* field)
 void
 PersonView::CreateFile(const entry_ref* ref, int32 format)
 {
-	delete fContactFile;
 	fContactFile = new BFile(ref,
 		B_READ_WRITE | B_CREATE_FILE);
-	fContact->Append(new BRawContact(format, fContactFile));
+
+	fContact->SetTo(new BRawContact(format, fContactFile));
 
 	Save();
 }
@@ -370,7 +370,7 @@ PersonView::IsSaved() const
 	if (fAddressWindow && fAddressWindow->HasChanged())
 		return false;
 
-	for (int32 i = fControls.CountItems() - 1; i >= 0; i--) {
+	for (int32 i = fControls.CountItems()-1; i >= 0; i--) {
 		if (fControls.ItemAt(i)->HasChanged())
 			return false;
 	}
@@ -439,9 +439,8 @@ PersonView::Reload(const entry_ref* ref)
 	}
 
 	if (ref != NULL) {
-		delete fContactFile;
 		fContactFile = new BFile(ref, B_READ_WRITE);
-		fContact->Append(new BRawContact(B_CONTACT_ANY, fContactFile));
+		fContact->SetTo(new BRawContact(B_CONTACT_ANY, fContactFile));
 	}
 
 	fContact->Reload();

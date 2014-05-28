@@ -1,10 +1,11 @@
 /*
- * Copyright 2010 Dario Casalinuovo
+ * Copyright 2011-2014 Dario Casalinuovo
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #include <ContactRoster.h>
 
 #include <FindDirectory.h>
+
 
 BContactRoster::BContactRoster()
 {
