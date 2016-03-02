@@ -21,7 +21,7 @@
 #include <Window.h>
 
 #include "DrawButton.h"
-#include "MediaRecorder.h"
+#include "MediaClient.h"
 #include "ScopeView.h"
 #include "SoundListView.h"
 #include "TransportButton.h"
@@ -42,7 +42,7 @@ class BSlider;
 class BStringView;
 
 
-using BPrivate::media::BMediaRecorder;
+using BPrivate::media::BMediaClient;
 
 
 class RecorderWindow : public BWindow {
@@ -93,7 +93,8 @@ private:
 		TrackSlider *fTrackSlider;
 		UpDownButton * fUpDownButton;
 		BMenuField * fInputField;
-		BMediaRecorder * fRecorder;
+		BMediaClient * fRecorder;
+		BMediaConnection * fInputConnection;
 		BSoundPlayer * fPlayer;
 		bool fRecording;
 		bool fExternalConnection;
@@ -168,8 +169,8 @@ private:
 		status_t UpdatePlayFile(SoundListItem *item, bool updateDisplay = false);
 		void ErrorAlert(const char * action, status_t err);
 
-static	void RecordFile(void * cookie, bigtime_t timestamp, void * data, size_t size, const media_format & format);
-static	void NotifyRecordFile(void * cookie, BMediaRecorder::notification code, ...);
+static	void RecordFile(BMediaConnection* conn, BBuffer* buf);
+static	void NotifyRecordFile(void * cookie, BMediaClient::notification code, ...);
 
 static	void PlayFile(void * cookie, void * data, size_t size, const media_raw_audio_format & format);
 static	void NotifyPlayFile(void * cookie, BSoundPlayer::sound_player_notification code, ...);

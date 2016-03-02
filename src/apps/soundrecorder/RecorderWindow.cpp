@@ -234,7 +234,7 @@ RecorderWindow::InitWindow()
 		if (error < B_OK) //	there's no mixer?
 			goto bad_mojo;
 
-		fRecorder = new BMediaRecorder("Sound Recorder",
+		fRecorder = new BMediaClient("Sound Recorder",
 			B_MEDIA_RAW_AUDIO);
 
 		if (fRecorder->InitCheck() < B_OK)
@@ -244,7 +244,11 @@ RecorderWindow::InitWindow()
 		media_format output_format;
 		output_format.type = B_MEDIA_RAW_AUDIO;
 		output_format.u.raw_audio = media_raw_audio_format::wildcard;
-		fRecorder->SetAcceptedFormat(output_format);
+
+		fInputConnection
+			= fRecorder->BeginConnection(B_MEDIA_INPUT);
+		fInputConnection->SetAcceptedFormat(output_format);
+		//fRecorder->SetAcceptedFormat(output_format);
 
 		//	Create the window header with controls
 		BRect r(Bounds());
@@ -874,7 +878,7 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 	status_t err = B_OK;
 	media_output audioOutput;
 
-	if (!fRecorder->IsConnected()) {
+	if (!fInputConnection->IsConnected()) {
 		//	Find an available output for the given input node.
 		int32 count = 0;
 		err = fRoster->GetFreeOutputsFor(input, &audioOutput, 1,
@@ -896,30 +900,29 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 		fRecordFormat.u.raw_audio = audioOutput.format.u.raw_audio;
 		fExternalConnection = false;
 	} else {
-		fRecordFormat.u.raw_audio = fRecorder->AcceptedFormat().u.raw_audio;
+		fRecordFormat.u.raw_audio
+			= fInputConnection->AcceptedFormat().u.raw_audio;
 		fExternalConnection = true;
 	}
 
 	fRecordFormat.type = B_MEDIA_RAW_AUDIO;
 
 	//	Tell the consumer where we want data to go.
-	err = fRecorder->SetHooks(RecordFile, NotifyRecordFile, this);
+	fInputConnection->SetHooks(RecordFile, NULL, this);
+	fRecorder->SetNotificationHook(NotifyRecordFile, this);
 
-	if (err < B_OK) {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" couldn't set the sound recorder's hook functions\n"));
-		return err;
-	}
+	if (!fInputConnection->IsConnected()) {
 
-	if (!fRecorder->IsConnected()) {
-
-		err = fRecorder->Connect(input, &audioOutput, &fRecordFormat);
+		BMediaConnection* destination = fRecorder->BeginConnection(audioOutput);
+		destination->SetAcceptedFormat(fRecordFormat);
+		err = fRecorder->Connect(fInputConnection, destination);
 
 		if (err < B_OK) {
 			CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
 				" failed to connect sound recorder to audio input node.\n"));
 
-			fRecorder->SetHooks(NULL, NULL, NULL);
+			fInputConnection->SetHooks(NULL, NULL, NULL);
+			fRecorder->SetNotificationHook(NULL, NULL);
 			return err;
 		}
 	}
@@ -953,7 +956,7 @@ RecorderWindow::StopRecording()
 		BreakRecordConnection();
 	}
 
-	fRecorder->SetHooks(NULL, NULL, NULL);
+	fInputConnection->SetHooks(NULL, NULL, NULL);
 
 	if (fRecSize > 0) {
 
@@ -1208,17 +1211,18 @@ RecorderWindow::RemoveCurrentSoundItem() {
 
 
 void
-RecorderWindow::RecordFile(void* cookie, bigtime_t timestamp,
-	void* data, size_t size, const media_format &format)
+RecorderWindow::RecordFile(BMediaConnection* conn, BBuffer* buf)
 {
 	//	Callback called from the SoundConsumer when receiving buffers.
-	RecorderWindow * window = (RecorderWindow *)cookie;
+	RecorderWindow * window = (RecorderWindow *)conn->Cookie();
 
 	if (window->fRecording) {
 		//	Write the data to file (we don't buffer or guard file access
 		//	or anything)
-		window->fRecFile.WriteAt(window->fRecSize, data, size);
-		window->fVUView->ComputeLevels(data, size, format.u.raw_audio.format);
+		size_t size = buf->SizeUsed();
+		window->fRecFile.WriteAt(window->fRecSize, buf->Data(), size);
+		window->fVUView->ComputeLevels(buf->Data(), size,
+			conn->AcceptedFormat().u.raw_audio.format);
 		window->fRecSize += size;
 	}
 }
@@ -1226,9 +1230,9 @@ RecorderWindow::RecordFile(void* cookie, bigtime_t timestamp,
 
 void
 RecorderWindow::NotifyRecordFile(void * cookie,
-	BMediaRecorder::notification code, ...)
+	BMediaClient::notification code, ...)
 {
-	if (code == BMediaRecorder::B_WILL_STOP) {
+	if (code == BMediaClient::B_WILL_STOP) {
 		RecorderWindow * window = (RecorderWindow *)cookie;
 		// Tell the window we've stopped, if it doesn't
 		// already know.
