@@ -170,10 +170,8 @@ public:
 
 	virtual bool				IsSeekable() const = 0;
 	virtual bool				IsFile() const = 0;
-
 	virtual	bool				IsEndless() const = 0;
-	virtual bool				IsCached() const = 0;
-	virtual size_t				CacheSize() const = 0;
+	//virtual size_t			CacheSize() = 0;
 
 private:
 								BMediaIO(const BMediaIO&);
