@@ -45,12 +45,12 @@ public:
 			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
 			if (fPosition != NULL) {
 				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, true);
-				// We have to reset our BDataIO reference too
-				fData = dynamic_cast<BDataIO*>(fPosition);
 				if (fPosition == NULL) {
 					fErr = B_NO_MEMORY;
 					return;
 				}
+				// We have to reset our BDataIO reference too
+				fData = dynamic_cast<BDataIO*>(fPosition);
 			} else {
 				// TODO: fallback buffering
 				// In this case we have to supply our own form
@@ -58,9 +58,8 @@ public:
 				// BDataIO.
 				TRACE("Unable to improve performance with a BufferIO\n");
 			}
-		} else {
+		} else
 			fData = source;
-		}
 	}
 
 	virtual	~BMediaIOWrapper()
