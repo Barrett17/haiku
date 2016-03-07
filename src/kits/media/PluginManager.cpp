@@ -19,6 +19,8 @@
 
 PluginManager gPluginManager;
 
+#define BLOCK_SIZE 4096
+
 
 class BMediaIOWrapper : public BMediaIO {
 public:
@@ -28,11 +30,14 @@ public:
 		fPosition(NULL),
 		fMedia(NULL),
 		fFile(NULL),
+		fFallbackBuffer(NULL),
+		fFallbackPosition(0),
 		fErr(B_NO_ERROR)
 	{
 		fPosition = dynamic_cast<BPositionIO*>(source);
 		fMedia = dynamic_cast<BMediaIO*>(source);
 		fFile = dynamic_cast<BFile*>(source);
+		fData = source;
 
 		// No need to do additional buffering if we have
 		// a BBufferIO or a BMediaIO.
@@ -52,10 +57,11 @@ public:
 				// In this case we have to supply our own form
 				// of pseudo-seekable object from a non-seekable
 				// BDataIO.
+				fFallbackBuffer = new BMallocIO();
+				fFallbackBuffer->SetBlockSize(BLOCK_SIZE);
 				TRACE("Unable to improve performance with a BufferIO\n");
 			}
-		} else
-			fData = source;
+		}
 	}
 
 	virtual	~BMediaIOWrapper()
@@ -70,9 +76,22 @@ public:
 		if (IsSeekable())
 			return fPosition->ReadAt(position, buffer, size);
 
-		// if (IsEndless()) {
-		//
-		// }
+		if (IsEndless()) {
+			off_t nextPos = position+size;
+			off_t bufSize = 0;
+			fFallbackBuffer->GetSize(&bufSize);
+
+			if (fFallbackPosition == position
+					&& nextPos > bufSize) {
+				fData->Read(buffer, size);
+				fFallbackBuffer->WriteAt(fFallbackPosition, buffer, size);
+				fFallbackPosition = nextPos;
+				return size;
+			} else if (nextPos <= bufSize) {
+				fFallbackPosition = nextPos;
+				return fFallbackBuffer->ReadAt(position, buffer, size);
+			}
+		}
 
 		return B_NOT_SUPPORTED;
 	}
@@ -83,6 +102,11 @@ public:
 		if (IsSeekable())
 			return fPosition->WriteAt(position, buffer, size);
 
+		if (IsEndless() && position == fFallbackPosition) {
+			fData->Write(buffer, size);
+			fFallbackPosition = position+size;
+		}
+
 		return B_NOT_SUPPORTED;
 	}
 
@@ -91,9 +115,8 @@ public:
 		if (IsSeekable())
 			return fPosition->Seek(position, seekMode);
 
-		// if (IsEndless()) {
-		//
-		// }
+		if (IsEndless())
+			return fFallbackBuffer->Seek(position, seekMode);
 
 		return B_NOT_SUPPORTED;
 	}
@@ -103,15 +126,18 @@ public:
 		if (IsSeekable())
 			return fPosition->Position();
 
-		// TODO: buffering
+		if (IsEndless())
+			return fFallbackBuffer->Position();
 
-		return 0;
+		return B_NOT_SUPPORTED;
 	}
 
 	virtual	status_t			SetSize(off_t size)
 	{
 		if (IsEndless())
 			return B_NOT_SUPPORTED;
+
+		// TODO: What a non seekable stream should do here?
 
 		return fPosition->SetSize(size);
 	}
@@ -175,6 +201,8 @@ private:
 	BMediaIO*					fMedia;
 	BFile*						fFile;
 
+	BMallocIO*					fFallbackBuffer;
+	off_t						fFallbackPosition;
 	status_t					fErr;
 };
 
