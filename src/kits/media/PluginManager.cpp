@@ -14,10 +14,6 @@
 #include "AddOnManager.h"
 #include "PluginManager.h"
 #include "DataExchange.h"
-
-#undef DEBUG
-#define DEBUG 3
-
 #include "debug.h"
 
 
