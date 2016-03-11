@@ -169,8 +169,8 @@ public:
 	virtual						~BMediaIO();
 
 	virtual bool				IsSeekable() const = 0;
-	virtual bool				IsFile() const = 0;
 	virtual	bool				IsEndless() const = 0;
+	virtual bool				IsCached() const = 0;
 
 	// TODO: Implement it
 	//virtual status_t			SetCacheSize(off_t size);
