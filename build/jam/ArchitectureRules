@@ -596,6 +596,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons media plugins musepack ;
 #	EnableWerror src add-ons media plugins ogg ;
 #	EnableWerror src add-ons media plugins raw_decoder ;
+	EnableWerror src add-ons media plugins rtsp_streamer ;
 #	EnableWerror src add-ons media plugins speex ;
 	EnableWerror src add-ons media plugins theora ;
 	EnableWerror src add-ons media plugins vorbis ;
