@@ -33,6 +33,7 @@
 #include <Catalog.h>
 #include <Debug.h>
 #include <fs_attr.h>
+#include <LayoutBuilder.h>
 #include <Language.h>
 #include <Locale.h>
 #include <MediaRoster.h>
@@ -76,6 +77,7 @@ int MainWin::sNoVideoWidth = MIN_WIDTH;
 enum {
 	M_DUMMY = 0x100,
 	M_FILE_OPEN = 0x1000,
+	M_NETWORK_STREAM_OPEN,
 	M_FILE_INFO,
 	M_FILE_PLAYLIST,
 	M_FILE_CLOSE,
@@ -831,6 +833,26 @@ MainWin::MessageReceived(BMessage* msg)
 			be_app->PostMessage(&appMessage);
 			break;
 		}
+
+		case M_NETWORK_STREAM_OPEN:
+		{
+			BWindow* window = new BWindow(BRect(80, 30, 200, 100),
+				"Insert network stream",
+				B_TITLED_WINDOW, B_NOT_RESIZABLE);
+
+			BMessage mess(B_REFS_RECEIVED);
+			BTextControl* textControl = new BTextControl("InputControl",
+					"Insert network URL", NULL, &mess);
+			textControl->SetTarget(this);
+
+			BLayoutBuilder::Group<>(window, B_VERTICAL)
+				.SetInsets(0, 0, 0, 0)
+				.Add(textControl)
+				.End();
+			window->Show();
+			break;
+		}
+
 		case M_FILE_INFO:
 			ShowFileInfo();
 			break;
@@ -1497,6 +1519,10 @@ MainWin::_CreateMenu()
 		B_TRANSLATE("Open file" B_UTF8_ELLIPSIS), NULL, NULL, this, 10, true,
 		NULL, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
+	fFileMenu->AddItem(item);
+
+	item = new BMenuItem(B_TRANSLATE("Open network stream"),
+		new BMessage(M_NETWORK_STREAM_OPEN));
 	fFileMenu->AddItem(item);
 
 	fFileMenu->AddSeparatorItem();
