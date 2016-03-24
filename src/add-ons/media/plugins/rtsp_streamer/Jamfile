@@ -1,14 +1,18 @@
 SubDir HAIKU_TOP src add-ons media plugins rtsp_streamer ;
 
-UsePrivateHeaders media ;
+UsePrivateHeaders media shared ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		UseBuildFeatureHeaders curl ;
 		Addon [ MultiArchDefaultGristFiles rtsp_streamer ] :
 			RTSPStreamerPlugin.cpp
 			RTSPMediaIO.cpp
-			: be media [ TargetLibsupc++ ]
+			rtsp.cpp
+			: be media bnetapi shared
+			[ BuildFeatureAttribute curl : library ]
+			[ TargetLibsupc++ ]
 		;
 	}
 }
