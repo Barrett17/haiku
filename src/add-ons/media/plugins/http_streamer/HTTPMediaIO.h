@@ -7,39 +7,45 @@
 
 
 #include <DataIO.h>
-#include <HttpRequest.h>
+#include <FileRequest.h>
 #include <Url.h>
 #include <UrlContext.h>
+#include <UrlProtocolDispatchingListener.h>
 
+
+class FileHandler;
 
 class HTTPMediaIO : public BMediaIO {
 public:
-							HTTPMediaIO(BUrl* url);
-	virtual					~HTTPMediaIO();
+										HTTPMediaIO(BUrl* url);
+	virtual								~HTTPMediaIO();
 
-			status_t		InitCheck() const;
+			status_t					InitCheck() const;
 
-	virtual	ssize_t			ReadAt(off_t position, void* buffer,
-								size_t size);
-	virtual	ssize_t			WriteAt(off_t position, const void* buffer,
-								size_t size);
-	virtual	off_t			Seek(off_t position, uint32 seekMode);
-	virtual off_t			Position() const;
+	virtual	ssize_t						ReadAt(off_t position, void* buffer,
+											size_t size);
+	virtual	ssize_t						WriteAt(off_t position,
+											const void* buffer, size_t size);
 
-	virtual	status_t		SetSize(off_t size);
-	virtual	status_t		GetSize(off_t* size) const;
+	virtual	off_t						Seek(off_t position, uint32 seekMode);
+	virtual off_t						Position() const;
 
-	virtual bool			IsSeekable() const;
-	virtual	bool			IsEndless() const;
+	virtual	status_t					SetSize(off_t size);
+	virtual	status_t					GetSize(off_t* size) const;
+
+	virtual bool						IsSeekable() const;
+	virtual	bool						IsEndless() const;
 
 private:
-	status_t				_IntegrityCheck();
+	status_t							_IntegrityCheck();
 
-	BUrlContext*			fContext;
-	BHttpRequest*			fReq;
+	BUrlContext*						fContext;
+	BFileRequest*						fReq;
+	BUrlProtocolDispatchingListener*	fListener;
 
-	BMallocIO*				fBuffer;
-	status_t				fInitErr;
+	FileHandler*						fFileHandler;
+
+	status_t							fInitErr;
 };
 
 #endif
