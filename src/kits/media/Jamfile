@@ -25,6 +25,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Deprecated.cpp
 			MediaRecorder.cpp
 			MediaIO.cpp
+			MediaClient.cpp
+			MediaConnection.cpp
 
 			# Public Media Kit
 			Buffer.cpp
@@ -59,6 +61,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			AddOnManager.cpp
 			BufferCache.cpp
 			DataExchange.cpp
+			MediaClientNode.cpp
 			DefaultMediaTheme.cpp
 			DormantNodeManager.cpp
 			FormatManager.cpp
