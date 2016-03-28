@@ -48,10 +48,8 @@ FallbackHeaderFunc(void *contents, size_t size, size_t nmemb, void* userp)
 status_t
 RTSPMediaIO::PlayThread(void* data)
 {
-	//RTSPMediaIO* fOwner = static_cast<RTSPMediaIO*>(data);
-	//fOwner->fLock.WriteLock();
-	
-	//fOwner->fBuffer->Seek(0, SEEK_SET);
+	RTSPMediaIO* fOwner = static_cast<RTSPMediaIO*>(data);
+	rtsp_play(fOwner->fCurl, fOwner->fUri, "0.000-");
 	return B_OK;
 }
 
@@ -108,9 +106,6 @@ RTSPMediaIO::RTSPMediaIO(BUrl* ourUrl)
 
 		if (gPlayThread <= 0 || resume_thread(gPlayThread) != B_OK)
 			fInitErr = B_ERROR;
-
-		rtsp_play(fCurl, fUri, "0.000-");
-		fBuffer->Seek(0, SEEK_SET);
 
 	  } else {
 		fprintf(stderr, "curl_easy_init() failed\n");
