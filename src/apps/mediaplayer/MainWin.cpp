@@ -225,6 +225,8 @@ MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	fInitialSeekPosition(0),
 	fAllowWinding(true)
 {
+	fHostAgent = MediaPlayerHost::InstantiateHostAgent(BMessenger(this));
+
 	// Handle window position and size depending on whether this is the
 	// first window or not. Use the window size from the window that was
 	// last resized by the user.
@@ -358,6 +360,8 @@ MainWin::~MainWin()
 	fController->PostMessage(B_QUIT_REQUESTED);
 	status_t exitValue;
 	wait_for_thread(controllerThread, &exitValue);
+
+	fHostAgent->Release();
 }
 
 

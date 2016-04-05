@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons media mediaplayer soundplay ;
+
+UsePrivateHeaders media shared ;
+
+UsePublicHeaders [ FDirName $(HAIKU_TOP) src apps mediaplayer plugin headers ] ;
+
+local sourceDirs =
+	headers
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media
+		mediaplayer soundplay $(sourceDir) ] ;
+}
+
+Addon soundplay.mediaplayer :
+	SPlayPlugin.cpp
+	SPlayAddOn.cpp
+	pluginproto.cpp
+	SPlaylist.cpp
+	: be media <nogrist>MediaPlayer [ TargetLibstdc++ ]
+		[ TargetLibsupc++ ]
+;

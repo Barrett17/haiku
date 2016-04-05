@@ -31,6 +31,7 @@
 #include "ControllerView.h"
 #include "InfoWin.h"
 #include "ListenerAdapter.h"
+#include "MediaPlayerHost.h"
 #include "Playlist.h"
 #include "PlaylistItem.h"
 #include "VideoView.h"
@@ -201,6 +202,8 @@ private:
 			bool				fScaleFullscreenControls;
 			bigtime_t			fInitialSeekPosition;
 			bool				fAllowWinding;
+
+			MediaPlayerHostAgent* fHostAgent;
 
 	static	int					sNoVideoWidth;
 };

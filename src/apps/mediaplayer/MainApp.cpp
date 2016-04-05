@@ -314,6 +314,7 @@ MainApp::MessageReceived(BMessage* message)
 		case M_SAVE_PANEL_RESULT:
 			_HandleSavePanelResult(message);
 			break;
+
 		case B_CANCEL:
 		{
 			// The user canceled a file panel, but store at least the current
